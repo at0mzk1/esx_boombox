@@ -117,10 +117,10 @@ function setVolume(coords)
             title = _U("set_volume"),
         }, function(data, menu)
             local value = tonumber(data.value) / 100
-            print("sound value provided: " .. tostring(value))
             if value < 0 or value > 1 then
                 ESX.ShowNotification(_U("sound_limit"))
             else
+                print("sound value provided: " .. tostring(value))
                 TriggerServerEvent("esx_hifi:set_volume", boomBoxName, value)
                 menu.close()
             end

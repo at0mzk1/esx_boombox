@@ -28,10 +28,10 @@ end)
 
 RegisterServerEvent('esx_hifi:stop_music')
 AddEventHandler('esx_hifi:stop_music', function(idMusic)
-	xSound:Destroy(-1, boomBoxName)
+	xSound:Destroy(-1, idMusic)
 end)
 
 RegisterServerEvent('esx_hifi:set_volume')
 AddEventHandler('esx_hifi:set_volume', function(idMusic, volume)
-	xSound:setVolume(idMusic, volume)
+	xSound:setVolume(-1, idMusic, volume)
 end)
