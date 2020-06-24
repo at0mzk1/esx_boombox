@@ -11,16 +11,16 @@ Keys = {
 }
 
 ESX = nil
-xSound = exports.xsound
 local menuOpen = false
 local wasOpen = false
 local lastEntity = nil
 local currentAction = nil
 local currentData = nil
+local boomBoxName = nil
 
 Citizen.CreateThread(function()
     while ESX == nil do
-        TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
+        TriggerEvent("esx:getSharedObject", function(obj) ESX = obj end)
         Citizen.Wait(0)
     end
 
@@ -31,39 +31,40 @@ Citizen.CreateThread(function()
     ESX.PlayerData = ESX.GetPlayerData()
 end)
 
-RegisterNetEvent('esx_hifi:place_hifi')
-AddEventHandler('esx_hifi:place_hifi', function()
+RegisterNetEvent("esx_hifi:place_hifi")
+AddEventHandler("esx_hifi:place_hifi", function()
 	local playerPed = PlayerPedId()
 	local coords, forward = GetEntityCoords(playerPed), GetEntityForwardVector(playerPed)
 	local objectCoords = (coords + forward * 1.0)
         startAnimation("anim@heists@money_grab@briefcase","put_down_case")
         Citizen.Wait(1000)
         ClearPedTasks(PlayerPedId())
-        ESX.Game.SpawnObject('prop_boombox_01', objectCoords, function(obj)
+        ESX.Game.SpawnObject("prop_boombox_01", objectCoords, function(obj)
         SetEntityHeading(obj, GetEntityHeading(playerPed))
         PlaceObjectOnGroundProperly(obj)
+        boomBoxName = GetPlayerName(PlayerId()) .. "_boombox"
     end)
 end)
 
 function OpenhifiMenu()
     menuOpen = true
-    ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'hifi', {
-        title   = _U('hifi_menu_title'),
-        align   = 'right',
+    ESX.UI.Menu.Open("default", GetCurrentResourceName(), "hifi", {
+        title   = _U("hifi_menu_title"),
+        align   = "right",
         elements = {
-            {label = _U('get_hifi'), value = 'get_hifi'},
-            {label = _U('play_music'), value = 'play'},
-            {label = _U('volume_music'), value = 'volume'},
-            {label = _U('stop_music'), value = 'stop'}
+            {label = _U("get_hifi"), value = "get_hifi"},
+            {label = _U("play_music"), value = "play"},
+            {label = _U("volume_music"), value = "volume"},
+            {label = _U("stop_music"), value = "stop"}
         }
     }, function(data, menu)
         local playerPed = PlayerPedId()
         local lCoords = GetEntityCoords(playerPed)
-        if data.current.value == 'get_hifi' then
+        if data.current.value == "get_hifi" then
             ESX.PlayerData = ESX.GetPlayerData()
             local alreadyOne = false
             for i=1, #ESX.PlayerData.inventory, 1 do
-                if ESX.PlayerData.inventory[i].name == 'hifi' and ESX.PlayerData.inventory[i].count > 0 then
+                if ESX.PlayerData.inventory[i].name == "hifi" and ESX.PlayerData.inventory[i].count > 0 then
                     alreadyOne = true
                 end
             end
@@ -78,28 +79,29 @@ function OpenhifiMenu()
                 DeleteEntity(currentData)
                 ESX.Game.DeleteObject(currentData)
                 if not DoesEntityExist(currentData) then
-                    TriggerServerEvent('esx_hifi:remove_hifi', lCoords)
+                    TriggerServerEvent("esx_hifi:remove_hifi", lCoords)
                     currentData = nil
                 end
+                boomBoxName = nil
                 Citizen.Wait(500)
                 ClearPedTasks(PlayerPedId())
             else
                 menu.close()
                 menuOpen = false
-                TriggerEvent('esx:showNotification', _U('hifi_alreadyOne'))
+                TriggerEvent("esx:showNotification", _U("hifi_alreadyOne"))
             end
-        elseif data.current.value == 'play' then
+        elseif data.current.value == "play" then
             play(lCoords)
-        elseif data.current.value == 'stop' then
-            if xSound:soundExists(GetPlayerName(PlayerId()) .. "_boombox") then
+        elseif data.current.value == "stop" then
+            if xSound:soundExists(boomBoxName) then
                 stop(lCoords)
                 menuOpen = false
                 menu.close()
             else
-                TriggerEvent('esx:showNotification', _U('not_found'))
+                TriggerEvent("esx:showNotification", _U("not_found"))
                 menu.close()
             end
-        elseif data.current.value == 'volume' then
+        elseif data.current.value == "volume" then
             setVolume(lCoords)
         end
     end, function(data, menu)
@@ -109,15 +111,15 @@ function OpenhifiMenu()
 end
 
 function setVolume(coords)
-    ESX.UI.Menu.Open('dialog', GetCurrentResourceName(), 'setvolume',
+    ESX.UI.Menu.Open("dialog", GetCurrentResourceName(), "setvolume",
         {
-            title = _U('set_volume'),
+            title = _U("set_volume"),
         }, function(data, menu)
-            local value = tonumber(data.value)
-            if value < 0 or value > 100 then
-                ESX.ShowNotification(_U('sound_limit'))
+            local value = tonumber(data.value) / 100
+            if value < 0 or value > 1 then
+                ESX.ShowNotification(_U("sound_limit"))
             else
-                xSound:setVolume(GetPlayerName(PlayerId()) .. "_boombox", value / 100)
+                TriggerServerEvent("esx_hifi:set_volume", boomBoxName, value)
                 menu.close()
             end
         end, function(data, menu)
@@ -126,14 +128,13 @@ function setVolume(coords)
 end
 
 function play(coords)
-    ESX.UI.Menu.Open('dialog', GetCurrentResourceName(), 'play',
+    ESX.UI.Menu.Open("dialog", GetCurrentResourceName(), "play",
         {
-            title = _U('play_id'),
+            title = _U("play_id"),
         }, function(data, menu)
-            local object = GetClosestObjectOfType(coords, 3.0, GetHashKey('prop_boombox_01'), false, false, false)
+            local object = GetClosestObjectOfType(coords, 3.0, GetHashKey("prop_boombox_01"), false, false, false)
             local objCoords = GetEntityCoords(object)
-            xSound:PlayUrlPos(GetPlayerName(PlayerId()) .. "_boombox", data.value, 1, objCoords)
-            xSound:Distance(GetPlayerName(PlayerId()) .. "_boombox", Config.distance)
+            TriggerServerEvent("esx_hifi:play_music", boomBoxName, data.value, 1, objCoords)
             menu.close()
         end, function(data, menu)
             menu.close()
@@ -141,12 +142,12 @@ function play(coords)
 end
 
 function stop(coords)
-            local object = GetClosestObjectOfType(coords, 3.0, GetHashKey('prop_boombox_01'), false, false, false)
+            local object = GetClosestObjectOfType(coords, 3.0, GetHashKey("prop_boombox_01"), false, false, false)
             local objCoords = GetEntityCoords(object)
             if(distanceToObject(object) < 50) then
-                xSound:Destroy(GetPlayerName(PlayerId()) .. "_boombox")
+                TriggerServerEvent("esx_hifi:stop_music", boomBoxName)
             else
-                TriggerEvent('esx:showNotification', _U('hifi_tooFar'))
+                TriggerEvent("esx:showNotification", _U("hifi_tooFar"))
                 return
             end
 end
@@ -161,7 +162,7 @@ Citizen.CreateThread(function()
         local closestDistance = -1
         local closestEntity   = nil
 
-        local object = GetClosestObjectOfType(coords, 3.0, GetHashKey('prop_boombox_01'), false, false, false)
+        local object = GetClosestObjectOfType(coords, 3.0, GetHashKey("prop_boombox_01"), false, false, false)
 
         if DoesEntityExist(object) then
             local objCoords = GetEntityCoords(object)
@@ -175,7 +176,7 @@ Citizen.CreateThread(function()
 
         if closestDistance ~= -1 and closestDistance <= 3.0 then
             if lastEntity ~= closestEntity and not menuOpen then
-                ESX.ShowHelpNotification(_U('hifi_help'))
+                ESX.ShowHelpNotification(_U("hifi_help"))
                 lastEntity = closestEntity
                 currentAction = "music"
                 currentData = closestEntity
@@ -190,12 +191,11 @@ Citizen.CreateThread(function()
     end
 end)
 
-
 Citizen.CreateThread(function()
     while true do
         Citizen.Wait(0)
         if currentAction then
-            if IsControlJustReleased(0, Keys[Config.boomboxKey]) and currentAction == 'music' then
+            if IsControlJustReleased(0, Keys[Config.boomboxKey]) and currentAction == "music" then
                 OpenhifiMenu()
             end
         end

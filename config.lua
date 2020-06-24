@@ -1,3 +1,4 @@
 Config = {}
-Config.Locale = 'fr'
-Config.distance = 8
+Config.Locale = 'en'
+Config.distance = 20
+Config.boomboxKey = "E"
