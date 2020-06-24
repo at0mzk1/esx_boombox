@@ -200,8 +200,13 @@ end)
 
 Citizen.CreateThread(function()
     while true do
-        Citizen.Wait(0)
+        Citizen.Wait(5000)
         if currentAction then
+            print("IsControlPressed(0, Keys[Config.boomboxKey]): " .. tostring(IsControlPressed(0, Keys[Config.boomboxKey])))
+            print("currentAction: " .. currentAction)
+            print("boomBoxOwner: " .. boomBoxOwner)
+            print("GetPlayerName(PlayerId()): " .. GetPlayerName(PlayerId()))
+            print("boomBoxOwner == GetPlayerName(PlayerId()): " .. boomBoxOwner == GetPlayerName(PlayerId()))
             if IsControlPressed(0, Keys[Config.boomboxKey]) and currentAction == "music" and boomBoxOwner == GetPlayerName(PlayerId()) then
                 OpenhifiMenu()
             else
