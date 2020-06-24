@@ -2,17 +2,18 @@
 
 ### Requirements
 - [esx_addoninventory](https://github.com/ESX-Org/esx_addoninventory)
+- [xsound](https://github.com/Xogy/xsound)
 
 ## Download & Installation
 
 ### Using Git
 ```
 cd resources
-git clone https://github.com/gta-rest-in-peace/esx_hifi.git [esx]/esx_hifi
+git clone https://github.com/at0mzk1/esx_hifi.git [esx]/esx_hifi
 ```
 
 ### Manually
-- Download https://github.com/gta-rest-in-peace/esx_hifi.git/archive/master.zip
+- Download https://github.com/at0mzk1/esx_hifi.git/archive/master.zip
 - Put it in the `[esx]` directory
 
 ## Installation

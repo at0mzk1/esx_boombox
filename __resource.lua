@@ -7,6 +7,7 @@ version '1.0.0'
 server_scripts {
     '@es_extended/locale.lua',
     'locales/fr.lua',
+    'locales/en.lua',
     'server/main.lua',
     'config.lua'
 }
@@ -14,7 +15,9 @@ server_scripts {
 client_script {
     '@es_extended/locale.lua',
     'client/main.lua',
+    'client/utils.lua',
     'locales/fr.lua',
+    'locales/en.lua',
     'config.lua'
 }
 
@@ -26,5 +29,6 @@ files {
 }
 
 dependencies {
-    'es_extended'
+    'es_extended',
+    'xsound'
 }

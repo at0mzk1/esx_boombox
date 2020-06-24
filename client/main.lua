@@ -11,6 +11,7 @@ Keys = {
 }
 
 ESX = nil
+xSound = exports.xsound
 local menuOpen = false
 local wasOpen = false
 local lastEntity = nil
@@ -32,65 +33,23 @@ end)
 
 RegisterNetEvent('esx_hifi:place_hifi')
 AddEventHandler('esx_hifi:place_hifi', function()
-    startAnimation("anim@heists@money_grab@briefcase","put_down_case")
-    Citizen.Wait(1000)
-    ClearPedTasks(PlayerPedId())
-    TriggerEvent('esx:spawnObject', 'prop_boombox_01')
+	local playerPed = PlayerPedId()
+	local coords, forward = GetEntityCoords(playerPed), GetEntityForwardVector(playerPed)
+	local objectCoords = (coords + forward * 1.0)
+        startAnimation("anim@heists@money_grab@briefcase","put_down_case")
+        Citizen.Wait(1000)
+        ClearPedTasks(PlayerPedId())
+        ESX.Game.SpawnObject('prop_boombox_01', objectCoords, function(obj)
+        SetEntityHeading(obj, GetEntityHeading(playerPed))
+        PlaceObjectOnGroundProperly(obj)
+    end)
 end)
-
-RegisterNetEvent('esx_hifi:play_music')
-AddEventHandler('esx_hifi:play_music', function(id, object)
-    if distance(object) < Config.distance then
-        SendNUIMessage({
-            transactionType = 'playSound',
-            transactionData = id
-        })
-
-        Citizen.CreateThread(function()
-            while true do
-                Citizen.Wait(100)
-                if distance(object) > Config.distance then
-                    SendNUIMessage({
-                        transactionType = 'stopSound'
-                    })
-                    break
-                end
-            end
-        end)
-    end
-end)
-
-RegisterNetEvent('esx_hifi:stop_music')
-AddEventHandler('esx_hifi:stop_music', function(object)
-    if distance(object) < Config.distance then
-        SendNUIMessage({
-            transactionType = 'stopSound'
-        })
-    end
-end)
-
-RegisterNetEvent('esx_hifi:setVolume')
-AddEventHandler('esx_hifi:setVolume', function(volume, object)
-    if distance(object) < Config.distance then
-        SendNUIMessage({
-            transactionType = 'volume',
-            transactionData = volume
-        })
-    end
-end)
-
-function distance(object)
-    local playerPed = PlayerPedId()
-    local lCoords = GetEntityCoords(playerPed)
-    local distance  = GetDistanceBetweenCoords(lCoords, object, true)
-    return distance
-end
 
 function OpenhifiMenu()
     menuOpen = true
     ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'hifi', {
-        title   = 'La hifi a momo',
-        align   = 'top-left',
+        title   = _U('hifi_menu_title'),
+        align   = 'right',
         elements = {
             {label = _U('get_hifi'), value = 'get_hifi'},
             {label = _U('play_music'), value = 'play'},
@@ -115,6 +74,7 @@ function OpenhifiMenu()
                 startAnimation("anim@heists@narcotics@trash","pickup")
                 Citizen.Wait(700)
                 SetEntityAsMissionEntity(currentData,false,true)
+                stop(lCoords)
                 DeleteEntity(currentData)
                 ESX.Game.DeleteObject(currentData)
                 if not DoesEntityExist(currentData) then
@@ -131,9 +91,14 @@ function OpenhifiMenu()
         elseif data.current.value == 'play' then
             play(lCoords)
         elseif data.current.value == 'stop' then
-            TriggerServerEvent('esx_hifi:stop_music', lCoords)
-            menuOpen = false
-            menu.close()
+            if xSound:soundExists(GetPlayerName(PlayerId()) .. "_boombox") then
+                stop(lCoords)
+                menuOpen = false
+                menu.close()
+            else
+                TriggerEvent('esx:showNotification', _U('not_found'))
+                menu.close()
+            end
         elseif data.current.value == 'volume' then
             setVolume(lCoords)
         end
@@ -152,7 +117,7 @@ function setVolume(coords)
             if value < 0 or value > 100 then
                 ESX.ShowNotification(_U('sound_limit'))
             else
-                TriggerServerEvent('esx_hifi:setVolume', value, coords)
+                xSound:setVolume(GetPlayerName(PlayerId()) .. "_boombox", value / 100)
                 menu.close()
             end
         end, function(data, menu)
@@ -160,17 +125,30 @@ function setVolume(coords)
         end)
 end
 
-
 function play(coords)
     ESX.UI.Menu.Open('dialog', GetCurrentResourceName(), 'play',
         {
-            title = _U('play'),
+            title = _U('play_id'),
         }, function(data, menu)
-            TriggerServerEvent('esx_hifi:play_music', data.value, coords)
+            local object = GetClosestObjectOfType(coords, 3.0, GetHashKey('prop_boombox_01'), false, false, false)
+            local objCoords = GetEntityCoords(object)
+            xSound:PlayUrlPos(GetPlayerName(PlayerId()) .. "_boombox", data.value, 1, objCoords)
+            xSound:Distance(GetPlayerName(PlayerId()) .. "_boombox", Config.distance)
             menu.close()
         end, function(data, menu)
             menu.close()
         end)
+end
+
+function stop(coords)
+            local object = GetClosestObjectOfType(coords, 3.0, GetHashKey('prop_boombox_01'), false, false, false)
+            local objCoords = GetEntityCoords(object)
+            if(distanceToObject(object) < 50) then
+                xSound:Destroy(GetPlayerName(PlayerId()) .. "_boombox")
+            else
+                TriggerEvent('esx:showNotification', _U('hifi_tooFar'))
+                return
+            end
 end
 
 Citizen.CreateThread(function()
@@ -216,17 +194,10 @@ end)
 Citizen.CreateThread(function()
     while true do
         Citizen.Wait(0)
-
         if currentAction then
-            if IsControlJustReleased(0, 38) and currentAction == 'music' then
+            if IsControlJustReleased(0, Keys[Config.boomboxKey]) and currentAction == 'music' then
                 OpenhifiMenu()
             end
         end
     end
 end)
-
-function startAnimation(lib,anim)
-    ESX.Streaming.RequestAnimDict(lib, function()
-        TaskPlayAnim(PlayerPedId(), lib, anim, 8.0, -8.0, -1, 1, 0, false, false, false)
-    end)
-end
