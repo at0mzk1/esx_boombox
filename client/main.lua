@@ -18,7 +18,7 @@ local lastEntity = nil
 local currentAction = nil
 local currentData = nil
 local boomBoxName = nil
-local boomBoxOwner = nil
+local boomBoxOwner = "nil"
 
 Citizen.CreateThread(function()
     while ESX == nil do
@@ -200,12 +200,17 @@ end)
 
 Citizen.CreateThread(function()
     while true do
-        Citizen.Wait(0)
+        Citizen.Wait(150)
         if currentAction then
-            if IsControlPressed(0, Keys[Config.boomboxKey]) and currentAction == "music" and trim(boomBoxOwner) == trim(GetPlayerName(PlayerId())) then
-                OpenhifiMenu()
-            else
-                TriggerEvent("esx:showNotification", _U("dont_own"))
+            if IsControlPressed(0, Keys[Config.boomboxKey]) and currentAction == "music" then
+                print("boomBoxOwner:" .. boomBoxOwner)
+                print("GetPlayerName(PlayerId()):" .. GetPlayerName(PlayerId()))
+                print("trim(boomBoxOwner) == trim(GetPlayerName(PlayerId())):" .. trim(boomBoxOwner) == trim(GetPlayerName(PlayerId())))
+                if trim(boomBoxOwner) == trim(GetPlayerName(PlayerId())) then
+                    OpenhifiMenu()
+                else
+                    TriggerEvent("esx:showNotification", _U("dont_own"))
+                end
             end
         end
     end
