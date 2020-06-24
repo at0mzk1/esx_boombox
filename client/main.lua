@@ -200,15 +200,9 @@ end)
 
 Citizen.CreateThread(function()
     while true do
-        Citizen.Wait(5000)
+        Citizen.Wait(0)
         if currentAction then
-            print("IsControlPressed(0, Keys[Config.boomboxKey]): " .. tostring(IsControlPressed(0, Keys[Config.boomboxKey])))
-            print("currentAction: " .. currentAction)
-            print("boomBoxOwner: " .. boomBoxOwner)
-            print("GetPlayerName(PlayerId()): " .. GetPlayerName(PlayerId()))
-            print("boomBoxOwner == GetPlayerName(PlayerId()): " .. tostring(boomBoxOwner == GetPlayerName(PlayerId())))
-            print("boomBoxOwner == GetPlayerName(PlayerId()): " .. tostring(trim(boomBoxOwner) == trim(GetPlayerName(PlayerId()))))
-            if IsControlPressed(0, Keys[Config.boomboxKey]) and currentAction == "music" and boomBoxOwner == GetPlayerName(PlayerId()) then
+            if IsControlPressed(0, Keys[Config.boomboxKey]) and currentAction == "music" and trim(boomBoxOwner) == trim(GetPlayerName(PlayerId())) then
                 OpenhifiMenu()
             else
                 TriggerEvent("esx:showNotification", _U("dont_own"))
