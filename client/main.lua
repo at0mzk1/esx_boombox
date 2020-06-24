@@ -205,9 +205,9 @@ Citizen.CreateThread(function()
 end)
 
 Citizen.CreateThread(function()
-    print("owner: " .. owner)
-    print("GetPlayerName(PlayerId()): " .. GetPlayerName(PlayerId()))
-    print("owner == GetPlayerName(PlayerId())? " .. tostring(owner == GetPlayerName(PlayerId())))
+    -- print("owner: " .. owner)
+    -- print("GetPlayerName(PlayerId()): " .. GetPlayerName(PlayerId()))
+    -- print("owner == GetPlayerName(PlayerId())? " .. tostring(owner == GetPlayerName(PlayerId())))
     while true do
         Citizen.Wait(0)
         if currentAction then
