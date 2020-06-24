@@ -123,7 +123,6 @@ function setVolume(coords)
             if value < 0 or value > 1 then
                 ESX.ShowNotification(_U("sound_limit"))
             else
-                print("sound value provided: " .. tostring(value))
                 TriggerServerEvent("esx_hifi:set_volume", boomBoxName, value)
                 menu.close()
             end
@@ -149,13 +148,8 @@ end
 function stop(coords)
             local object = GetClosestObjectOfType(coords, 3.0, GetHashKey("prop_boombox_01"), false, false, false)
             local objCoords = GetEntityCoords(object)
-            print("coords: " .. tostring(coords))
-            print("objCoords: " .. tostring(objCoords))
-            print("distance: " .. tostring(distanceToObject(object)))
             local playerPed = PlayerPedId()
             local lCoords = GetEntityCoords(playerPed)
-            print("GetDistanceBetweenCoords(lCoords, object, true): " .. tostring(GetDistanceBetweenCoords(lCoords, object, true)))
-            print("coords - objCoords: " .. tostring(#(coords - objCoords)))
             local distance = #(coords - objCoords)
             if(distance < 50) then
                 TriggerServerEvent("esx_hifi:stop_music", boomBoxName)
@@ -208,7 +202,7 @@ Citizen.CreateThread(function()
     while true do
         Citizen.Wait(0)
         if currentAction then
-            if IsControlJustReleased(0, Keys[Config.boomboxKey]) and currentAction == "music" and boomBoxOwner == GetPlayerName(PlayerId()) then
+            if IsControlPressed(0, Keys[Config.boomboxKey]) and currentAction == "music" and boomBoxOwner == GetPlayerName(PlayerId()) then
                 OpenhifiMenu()
             else
                 TriggerEvent("esx:showNotification", _U("dont_own"))
