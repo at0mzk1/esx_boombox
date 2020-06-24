@@ -18,6 +18,7 @@ local lastEntity = nil
 local currentAction = nil
 local currentData = nil
 local boomBoxName = nil
+local boomBoxOwner = nil
 
 Citizen.CreateThread(function()
     while ESX == nil do
@@ -44,6 +45,7 @@ AddEventHandler("esx_hifi:place_hifi", function()
         SetEntityHeading(obj, GetEntityHeading(playerPed))
         PlaceObjectOnGroundProperly(obj)
         boomBoxName = GetPlayerName(PlayerId()) .. "_boombox"
+        owner = GetPlayerName(PlayerId())
     end)
 end)
 
@@ -84,6 +86,7 @@ function OpenhifiMenu()
                     currentData = nil
                 end
                 boomBoxName = nil
+                owner = nil
                 Citizen.Wait(500)
                 ClearPedTasks(PlayerPedId())
             else
@@ -146,6 +149,12 @@ end
 function stop(coords)
             local object = GetClosestObjectOfType(coords, 3.0, GetHashKey("prop_boombox_01"), false, false, false)
             local objCoords = GetEntityCoords(object)
+            print("coords: " .. tostring(coords))
+            print("objCoords: " .. tostring(objCoords))
+            print("distance: " .. tostring(distanceToObject(object)))
+            local playerPed = PlayerPedId()
+            local lCoords = GetEntityCoords(playerPed)
+            print("GetDistanceBetweenCoords(lCoords, object, true): " .. tostring(GetDistanceBetweenCoords(lCoords, object, true)))
             if(distanceToObject(object) < 50) then
                 TriggerServerEvent("esx_hifi:stop_music", boomBoxName)
             else
@@ -197,8 +206,10 @@ Citizen.CreateThread(function()
     while true do
         Citizen.Wait(0)
         if currentAction then
-            if IsControlJustReleased(0, Keys[Config.boomboxKey]) and currentAction == "music" then
+            if IsControlJustReleased(0, Keys[Config.boomboxKey]) and currentAction == "music" and owner = GetPlayerName(PlayerId()) then
                 OpenhifiMenu()
+            else
+                TriggerEvent("esx:showNotification", _U("dont_own"))
             end
         end
     end
