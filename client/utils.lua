@@ -10,3 +10,7 @@ function startAnimation(lib,anim)
         TaskPlayAnim(PlayerPedId(), lib, anim, 8.0, -8.0, -1, 1, 0, false, false, false)
     end)
 end
+
+function trim(s)
+    return s:match( "^%s*(.-)%s*$" )
+end
