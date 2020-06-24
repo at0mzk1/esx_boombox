@@ -155,8 +155,8 @@ function stop(coords)
             local playerPed = PlayerPedId()
             local lCoords = GetEntityCoords(playerPed)
             print("GetDistanceBetweenCoords(lCoords, object, true): " .. tostring(GetDistanceBetweenCoords(lCoords, object, true)))
-            print("coords - objCoords: " .. tostring(coords - objCoords))
-            local distance = coords - objCoords
+            print("coords - objCoords: " .. tostring(#(coords - objCoords)))
+            local distance = #(coords - objCoords)
             if(distance < 50) then
                 TriggerServerEvent("esx_hifi:stop_music", boomBoxName)
             else
