@@ -206,7 +206,7 @@ Citizen.CreateThread(function()
     while true do
         Citizen.Wait(0)
         if currentAction then
-            if IsControlJustReleased(0, Keys[Config.boomboxKey]) and currentAction == "music" and owner = GetPlayerName(PlayerId()) then
+            if IsControlJustReleased(0, Keys[Config.boomboxKey]) and currentAction == "music" and owner == GetPlayerName(PlayerId()) then
                 OpenhifiMenu()
             else
                 TriggerEvent("esx:showNotification", _U("dont_own"))
