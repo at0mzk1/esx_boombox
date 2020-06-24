@@ -45,7 +45,7 @@ AddEventHandler("esx_hifi:place_hifi", function()
         SetEntityHeading(obj, GetEntityHeading(playerPed))
         PlaceObjectOnGroundProperly(obj)
         boomBoxName = GetPlayerName(PlayerId()) .. "_boombox"
-        owner = GetPlayerName(PlayerId())
+        boomBoxOwner = GetPlayerName(PlayerId())
     end)
 end)
 
@@ -86,7 +86,7 @@ function OpenhifiMenu()
                     currentData = nil
                 end
                 boomBoxName = nil
-                owner = nil
+                boomBoxOwner = nil
                 Citizen.Wait(500)
                 ClearPedTasks(PlayerPedId())
             else
@@ -205,13 +205,10 @@ Citizen.CreateThread(function()
 end)
 
 Citizen.CreateThread(function()
-    -- print("owner: " .. owner)
-    -- print("GetPlayerName(PlayerId()): " .. GetPlayerName(PlayerId()))
-    -- print("owner == GetPlayerName(PlayerId())? " .. tostring(owner == GetPlayerName(PlayerId())))
     while true do
         Citizen.Wait(0)
         if currentAction then
-            if IsControlJustReleased(0, Keys[Config.boomboxKey]) and currentAction == "music" and owner == GetPlayerName(PlayerId()) then
+            if IsControlJustReleased(0, Keys[Config.boomboxKey]) and currentAction == "music" and boomBoxOwner == GetPlayerName(PlayerId()) then
                 OpenhifiMenu()
             else
                 TriggerEvent("esx:showNotification", _U("dont_own"))
