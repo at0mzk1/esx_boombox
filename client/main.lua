@@ -155,7 +155,9 @@ function stop(coords)
             local playerPed = PlayerPedId()
             local lCoords = GetEntityCoords(playerPed)
             print("GetDistanceBetweenCoords(lCoords, object, true): " .. tostring(GetDistanceBetweenCoords(lCoords, object, true)))
-            if(distanceToObject(object) < 50) then
+            print("coords - objCoords: " .. tostring(coords - objCoords))
+            local distance = coords - objCoords
+            if(distance < 50) then
                 TriggerServerEvent("esx_hifi:stop_music", boomBoxName)
             else
                 TriggerEvent("esx:showNotification", _U("hifi_tooFar"))
@@ -206,6 +208,9 @@ Citizen.CreateThread(function()
     while true do
         Citizen.Wait(0)
         if currentAction then
+            print("owner: " .. owner)
+            print("GetPlayerName(PlayerId()): " .. GetPlayerName(PlayerId()))
+            print("owner == GetPlayerName(PlayerId())? " .. tostring(owner == GetPlayerName(PlayerId())))
             if IsControlJustReleased(0, Keys[Config.boomboxKey]) and currentAction == "music" and owner == GetPlayerName(PlayerId()) then
                 OpenhifiMenu()
             else
