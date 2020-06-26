@@ -200,7 +200,7 @@ end)
 
 Citizen.CreateThread(function()
     while true do
-        Citizen.Wait(150)
+        Citizen.Wait(0)
         if currentAction then
             if IsControlPressed(0, Keys[Config.boomboxKey]) and currentAction == "music" then
                 print("boomBoxOwner:" .. boomBoxOwner)
