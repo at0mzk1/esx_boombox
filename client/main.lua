@@ -86,7 +86,7 @@ function OpenhifiMenu()
                     currentData = nil
                 end
                 boomBoxName = nil
-                boomBoxOwner = nil
+                boomBoxOwner = "nil"
                 Citizen.Wait(500)
                 ClearPedTasks(PlayerPedId())
             else
