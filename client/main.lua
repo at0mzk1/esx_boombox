@@ -13,6 +13,7 @@ Keys = {
 ESX = nil
 xSound = exports.xsound
 local menuOpen = false
+local adminMenuOpen = false
 local wasOpen = false
 local lastEntity = nil
 local currentAction = nil
@@ -33,8 +34,8 @@ Citizen.CreateThread(function()
     ESX.PlayerData = ESX.GetPlayerData()
 end)
 
-RegisterNetEvent("esx_hifi:place_hifi")
-AddEventHandler("esx_hifi:place_hifi", function()
+RegisterNetEvent("esx_boombox:place_boombox")
+AddEventHandler("esx_boombox:place_boombox", function()
 	local playerPed = PlayerPedId()
 	local coords, forward = GetEntityCoords(playerPed), GetEntityForwardVector(playerPed)
 	local objectCoords = (coords + forward * 1.0)
@@ -49,13 +50,13 @@ AddEventHandler("esx_hifi:place_hifi", function()
     end)
 end)
 
-function OpenhifiMenu()
+function OpenboomboxMenu()
     menuOpen = true
-    ESX.UI.Menu.Open("default", GetCurrentResourceName(), "hifi", {
-        title   = _U("hifi_menu_title"),
+    ESX.UI.Menu.Open("default", GetCurrentResourceName(), "boombox", {
+        title   = _U("boombox_menu_title"),
         align   = "right",
         elements = {
-            {label = _U("get_hifi"), value = "get_hifi"},
+            {label = _U("get_boombox"), value = "get_boombox"},
             {label = _U("play_music"), value = "play"},
             {label = _U("volume_music"), value = "volume"},
             {label = _U("stop_music"), value = "stop"}
@@ -63,11 +64,11 @@ function OpenhifiMenu()
     }, function(data, menu)
         local playerPed = PlayerPedId()
         local lCoords = GetEntityCoords(playerPed)
-        if data.current.value == "get_hifi" then
+        if data.current.value == "get_boombox" then
             ESX.PlayerData = ESX.GetPlayerData()
             local alreadyOne = false
             for i=1, #ESX.PlayerData.inventory, 1 do
-                if ESX.PlayerData.inventory[i].name == "hifi" and ESX.PlayerData.inventory[i].count > 0 then
+                if ESX.PlayerData.inventory[i].name == "boombox" and ESX.PlayerData.inventory[i].count > 0 then
                     alreadyOne = true
                 end
             end
@@ -82,7 +83,7 @@ function OpenhifiMenu()
                 DeleteEntity(currentData)
                 ESX.Game.DeleteObject(currentData)
                 if not DoesEntityExist(currentData) then
-                    TriggerServerEvent("esx_hifi:remove_hifi", lCoords)
+                    TriggerServerEvent("esx_boombox:remove_boombox", lCoords)
                     currentData = nil
                 end
                 boomBoxName = nil
@@ -92,7 +93,7 @@ function OpenhifiMenu()
             else
                 menu.close()
                 menuOpen = false
-                TriggerEvent("esx:showNotification", _U("hifi_alreadyOne"))
+                TriggerEvent("esx:showNotification", _U("boombox_alreadyOne"))
             end
         elseif data.current.value == "play" then
             play(lCoords)
@@ -114,6 +115,61 @@ function OpenhifiMenu()
     end)
 end
 
+function OpenAdminMenu()
+    adminMenuOpen = true
+    ESX.UI.Menu.Open("default", GetCurrentResourceName(), "boombox", {
+        title   = _U("boombox_menu_title"),
+        align   = "right",
+        elements = {
+            {label = _U("get_boombox"), value = "get_boombox"},
+            {label = _U("play_music"), value = "play"},
+            {label = _U("volume_music"), value = "volume"},
+            {label = _U("stop_music"), value = "stop"}
+        }
+    }, function(data, menu)
+        local playerPed = PlayerPedId()
+        local lCoords = GetEntityCoords(playerPed)
+        if data.current.value == "get_boombox" then
+            menuOpen = false
+            menu.close()
+            pickupBoomBox(lCoords)
+        elseif data.current.value == "play" then
+            play(lCoords)
+        elseif data.current.value == "stop" then
+            if xSound:soundExists(boomBoxName) then
+                stop(lCoords)
+            else
+                TriggerEvent("esx:showNotification", _U("not_found"))
+            end
+            menuOpen = false
+            menu.close()
+        elseif data.current.value == "volume" then
+            setVolume(lCoords)
+        end
+    end, function(data, menu)
+        menuOpen = false
+        menu.close()
+    end)
+end
+
+function pickupBoomBox(coords)
+    NetworkRequestControlOfEntity(currentData)
+    startAnimation("anim@heists@narcotics@trash","pickup")
+    Citizen.Wait(700)
+    SetEntityAsMissionEntity(currentData,false,true)
+    stop(coords)
+    DeleteEntity(currentData)
+    ESX.Game.DeleteObject(currentData)
+    if not DoesEntityExist(currentData) then
+        TriggerServerEvent("esx_boombox:remove_boombox", coords)
+        currentData = nil
+    end
+    boomBoxName = nil
+    boomBoxOwner = "nil"
+    Citizen.Wait(500)
+    ClearPedTasks(PlayerPedId())
+end
+
 function setVolume(coords)
     ESX.UI.Menu.Open("dialog", GetCurrentResourceName(), "setvolume",
         {
@@ -123,7 +179,7 @@ function setVolume(coords)
             if value < 0 or value > 1 then
                 ESX.ShowNotification(_U("sound_limit"))
             else
-                TriggerServerEvent("esx_hifi:set_volume", boomBoxName, value)
+                TriggerServerEvent("esx_boombox:set_volume", boomBoxName, value)
                 menu.close()
             end
         end, function(data, menu)
@@ -138,7 +194,7 @@ function play(coords)
         }, function(data, menu)
             local object = GetClosestObjectOfType(coords, 3.0, GetHashKey("prop_boombox_01"), false, false, false)
             local objCoords = GetEntityCoords(object)
-            TriggerServerEvent("esx_hifi:play_music", boomBoxName, data.value, 1, objCoords)
+            TriggerServerEvent("esx_boombox:play_music", boomBoxName, data.value, 1, objCoords)
             menu.close()
         end, function(data, menu)
             menu.close()
@@ -152,11 +208,36 @@ function stop(coords)
             local lCoords = GetEntityCoords(playerPed)
             local distance = #(coords - objCoords)
             if(distance < 50) then
-                TriggerServerEvent("esx_hifi:stop_music", boomBoxName)
+                TriggerServerEvent("esx_boombox:stop_music", boomBoxName)
             else
-                TriggerEvent("esx:showNotification", _U("hifi_tooFar"))
+                TriggerEvent("esx:showNotification", _U("boombox_tooFar"))
                 return
             end
+end
+
+function getClosestBoomBox()
+    TriggerServerEvent("esx_boombox:get_boomboxes", function(boomBoxes)
+        if boomBoxes then
+            local closestBoomboxPos = nil
+            local closestBoomboxName = nil
+            for k,v in pairs(boomBoxes) do
+              local plyPos = GetEntityCoords(GetPlayerPed(-1))
+              local dist = GetVecDist(plyPos, GetEntityCoords(v))
+              if dist < 50.0 then
+                if closestBoomboxName and GetVecDist(plyPos, closestBoomboxPos) < dist then
+                    closestBoomboxName = k
+                    closestBoomboxPos = v
+                else
+                    closestBoomboxName = k
+                    closestBoomboxPos = v
+                end
+              end
+            end
+            boomBoxName = closestBoomboxName
+        else
+        TriggerEvent("esx:showNotification", _U("not_found"))
+        end
+    end)
 end
 
 Citizen.CreateThread(function()
@@ -183,7 +264,7 @@ Citizen.CreateThread(function()
 
         if closestDistance ~= -1 and closestDistance <= 3.0 then
             if lastEntity ~= closestEntity and not menuOpen then
-                ESX.ShowHelpNotification(_U("hifi_help"))
+                ESX.ShowHelpNotification(_U("boombox_help"))
                 lastEntity = closestEntity
                 currentAction = "music"
                 currentData = closestEntity
@@ -203,11 +284,10 @@ Citizen.CreateThread(function()
         Citizen.Wait(0)
         if currentAction then
             if IsControlPressed(0, Keys[Config.boomboxKey]) and currentAction == "music" then
-                print("boomBoxOwner:" .. boomBoxOwner)
-                print("GetPlayerName(PlayerId()):" .. GetPlayerName(PlayerId()))
-                print("trim(boomBoxOwner) == trim(GetPlayerName(PlayerId())):" .. trim(boomBoxOwner) == trim(GetPlayerName(PlayerId())))
                 if trim(boomBoxOwner) == trim(GetPlayerName(PlayerId())) then
-                    OpenhifiMenu()
+                    OpenboomboxMenu()
+                elseif ESX.PlayerData.job.name == "police" then
+                    OpenAdminMenu()
                 else
                     TriggerEvent("esx:showNotification", _U("dont_own"))
                 end
