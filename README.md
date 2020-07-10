@@ -6,6 +6,7 @@ This is an updated fork from https://github.com/gta-rest-in-peace/esx_hifi
 ### Requirements
 - [esx_addoninventory](https://github.com/ESX-Org/esx_addoninventory)
 - [xsound](https://github.com/Xogy/xsound)
+- [essentialmode](https://github.com/kanersps/essentialmode) (For admin commands)
 
 ## Download & Installation
 

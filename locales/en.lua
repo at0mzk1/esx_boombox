@@ -1,5 +1,6 @@
 Locales ["en"] = {
 	["boombox_menu_title"] = "Boombox Menu",
+	["boombox_admin_menu_title"] = "Boombox Admin Menu.",
 	["put_boombox"] = "You have just dropped the Boombox",
 	["get_boombox"] = "Pick up the Boombox",
 	["play_music"] = "Start the music",
@@ -12,5 +13,8 @@ Locales ["en"] = {
 	["sound_limit"] = "The volume must be between 0 and 100",
 	["boombox_help"] = "press ~INPUT_CONTEXT~ to adjust the music",
 	["boombox_tooFar"] = "You're too far to control the music.",
-	["dont_own"] = "You don't own this Boombox."
+	["dont_own"] = "You don't own this Boombox.",
+	["sounds_destroyed"] = "All Boomboxes have been turned off.",
+	["sounds_destroyed_help"] = "Turns off all boomboxes in the server.",
+	["no_boomboxes"] = "There are no boomboxes in the server."
 }

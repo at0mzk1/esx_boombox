@@ -50,11 +50,11 @@ AddEventHandler("esx_boombox:place_boombox", function()
     end)
 end)
 
-function OpenboomboxMenu()
+function OpenBoomboxMenu()
     menuOpen = true
     ESX.UI.Menu.Open("default", GetCurrentResourceName(), "boombox", {
         title   = _U("boombox_menu_title"),
-        align   = "right",
+        align   = Config.menuAlignment,
         elements = {
             {label = _U("get_boombox"), value = "get_boombox"},
             {label = _U("play_music"), value = "play"},
@@ -65,36 +65,9 @@ function OpenboomboxMenu()
         local playerPed = PlayerPedId()
         local lCoords = GetEntityCoords(playerPed)
         if data.current.value == "get_boombox" then
-            ESX.PlayerData = ESX.GetPlayerData()
-            local alreadyOne = false
-            for i=1, #ESX.PlayerData.inventory, 1 do
-                if ESX.PlayerData.inventory[i].name == "boombox" and ESX.PlayerData.inventory[i].count > 0 then
-                    alreadyOne = true
-                end
-            end
-            if not alreadyOne then
-                NetworkRequestControlOfEntity(currentData)
-                menu.close()
-                menuOpen = false
-                startAnimation("anim@heists@narcotics@trash","pickup")
-                Citizen.Wait(700)
-                SetEntityAsMissionEntity(currentData,false,true)
-                stop(lCoords)
-                DeleteEntity(currentData)
-                ESX.Game.DeleteObject(currentData)
-                if not DoesEntityExist(currentData) then
-                    TriggerServerEvent("esx_boombox:remove_boombox", lCoords)
-                    currentData = nil
-                end
-                boomBoxName = nil
-                boomBoxOwner = "nil"
-                Citizen.Wait(500)
-                ClearPedTasks(PlayerPedId())
-            else
-                menu.close()
-                menuOpen = false
-                TriggerEvent("esx:showNotification", _U("boombox_alreadyOne"))
-            end
+            menuOpen = false
+            menu.close()
+            pickupBoomBox(lCoords)
         elseif data.current.value == "play" then
             play(lCoords)
         elseif data.current.value == "stop" then
@@ -115,39 +88,28 @@ function OpenboomboxMenu()
     end)
 end
 
-function OpenAdminMenu()
+function OpenAdminMenu(boomBoxes)
     adminMenuOpen = true
-    ESX.UI.Menu.Open("default", GetCurrentResourceName(), "boombox", {
-        title   = _U("boombox_menu_title"),
-        align   = "right",
-        elements = {
-            {label = _U("get_boombox"), value = "get_boombox"},
-            {label = _U("play_music"), value = "play"},
-            {label = _U("volume_music"), value = "volume"},
-            {label = _U("stop_music"), value = "stop"}
-        }
+    if #boomBoxes == 0 then
+        ESX.ShowNotification(_U('no_boomboxes'))
+    else
+        for id,pos in pairs(boomBoxes) do
+            table.insert(elements, {label = id, value = pos})
+        end
+    end
+
+    ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'boombox', {
+        title = _U('boombox_admin_menu_title'),
+        align = Config.menuAlignment,
+        elements = elements
     }, function(data, menu)
-        local playerPed = PlayerPedId()
-        local lCoords = GetEntityCoords(playerPed)
-        if data.current.value == "get_boombox" then
-            menuOpen = false
+        if data.current.value == nil then
+        else
+            boomBoxName = data.current.value
             menu.close()
-            pickupBoomBox(lCoords)
-        elseif data.current.value == "play" then
-            play(lCoords)
-        elseif data.current.value == "stop" then
-            if xSound:soundExists(boomBoxName) then
-                stop(lCoords)
-            else
-                TriggerEvent("esx:showNotification", _U("not_found"))
-            end
-            menuOpen = false
-            menu.close()
-        elseif data.current.value == "volume" then
-            setVolume(lCoords)
+            OpenBoomboxMenu()
         end
     end, function(data, menu)
-        menuOpen = false
         menu.close()
     end)
 end
@@ -285,7 +247,7 @@ Citizen.CreateThread(function()
         if currentAction then
             if IsControlPressed(0, Keys[Config.boomboxKey]) and currentAction == "music" then
                 if trim(boomBoxOwner) == trim(GetPlayerName(PlayerId())) then
-                    OpenboomboxMenu()
+                    OpenBoomboxMenu()
                 elseif ESX.PlayerData.job.name == "police" then
                     OpenAdminMenu()
                 else
@@ -295,3 +257,6 @@ Citizen.CreateThread(function()
         end
     end
 end)
+
+RegisterNetEvent('esx_boombox:boomboxes_menu')
+AddEventHandler('esx_boombox:boomboxes_menu', function(data) OpenAdminMenu(data); end)
