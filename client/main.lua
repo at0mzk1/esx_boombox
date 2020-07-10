@@ -187,7 +187,7 @@ function getClosestBoomBox(boomBoxes)
     local closestBoomboxName = nil
     for k,v in pairs(boomBoxes) do
         local plyPos = GetEntityCoords(GetPlayerPed(-1))
-        local dist = GetVecDist(plyPos, GetEntityCoords(v))
+        local dist = GetVecDist(plyPos, v)
         if dist < 50.0 then
             if closestBoomboxName and GetVecDist(plyPos, closestBoomboxPos) < dist then
                 print(closestBoomboxName)
