@@ -47,8 +47,8 @@ AddEventHandler("esx_boombox:place_boombox", function()
         PlaceObjectOnGroundProperly(obj)
         boomBoxName = GetPlayerName(PlayerId()) .. "_boombox"
         boomBoxOwner = GetPlayerName(PlayerId())
+        TriggerServerEvent("esx_boombox:set_boombox", boomBoxName, objectCoords)
     end)
-    TriggerServerEvent("esx_boombox:set_boombox", boomBoxName, objectCoords)
 end)
 
 function OpenBoomboxMenu()
