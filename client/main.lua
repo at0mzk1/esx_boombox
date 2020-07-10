@@ -180,7 +180,7 @@ end
 
 function getClosestBoomBox()
     TriggerServerEvent("esx_boombox:get_boomboxes", function(boomBoxes)
-        print(boomBoxes)
+        print("boomboxes: " .. boomBoxes)
         if boomBoxes then
             local closestBoomboxPos = nil
             local closestBoomboxName = nil
@@ -252,6 +252,7 @@ Citizen.CreateThread(function()
                     OpenBoomboxMenu()
                 elseif ESX.PlayerData.job.name == "police" then
                     getClosestBoomBox()
+                    print(boomBoxName)
                     OpenBoomboxMenu()
                 else
                     TriggerEvent("esx:showNotification", _U("dont_own"))
