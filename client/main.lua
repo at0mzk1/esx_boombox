@@ -89,12 +89,13 @@ function OpenBoomboxMenu()
 end
 
 function OpenAdminMenu(boomBoxes)
+    local elements = {}
     adminMenuOpen = true
     if boomBoxes == nil then
         ESX.ShowNotification(_U('no_boomboxes'))
     else
         for id,pos in pairs(boomBoxes) do
-            table.insert(elements, {label = id, value = pos})
+            table.insert(elements, {label = id, value = id})
         end
         ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'boombox', {
             title = _U('boombox_admin_menu_title'),
@@ -103,6 +104,7 @@ function OpenAdminMenu(boomBoxes)
         }, function(data, menu)
             if data.current.value == nil then
             else
+                print(data.current.value)
                 boomBoxName = data.current.value
                 menu.close()
                 OpenBoomboxMenu()

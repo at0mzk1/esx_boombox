@@ -8,8 +8,6 @@ ESX.RegisterUsableItem('boombox', function(source)
 	local xPlayer = ESX.GetPlayerFromId(source)
 	
 	xPlayer.removeInventoryItem('boombox', 1)
-	
-	TriggerClientEvent('esx_boombox:place_boombox', source)
 	xPlayer.showNotification(_U('put_boombox'))
 end)
 
@@ -25,8 +23,7 @@ RegisterServerEvent('esx_boombox:play_music')
 AddEventHandler('esx_boombox:play_music', function(idMusic, url, volume, pos)
 	xSound:PlayUrlPos(-1,idMusic, url, volume, pos)
 	xSound:Distance(-1, idMusic, Config.distance)
-	boomBoxes.idMusic = pos
-	print(boomBoxes)
+	boomBoxes[idMusic] = pos
 end)
 
 RegisterServerEvent('esx_boombox:stop_music')
@@ -52,16 +49,17 @@ end)
 RegisterCommand("removeSounds", function(source, args, rawCommand)
 	if boomBoxes ~= nil then
 		if source == 0 then
-				for id,pos in ipairs(boomBoxes) do
+				for id,pos in pairs(boomBoxes) do
 					xSound:Destroy(-1, id)
 				end
 		else
 			local xPlayer = ESX.GetPlayerFromId(source)
 			if(hasPermissions(xPlayer)) then
-				for id,pos in ipairs(boomBoxes) do
+				for id,pos in pairs(boomBoxes) do
 					xSound:Destroy(-1, id)
 				end
 				xPlayer.showNotification(_U('sounds_destroyed'), false, true, 210)
+				ESX.ShowNotification(_U('put_boombox'), false, true, 210)
 			else
 				xPlayer.showNotification("Insufficient Permissions.", false, true, 130)
 			end
