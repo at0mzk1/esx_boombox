@@ -200,7 +200,7 @@ function getClosestBoomBox(boomBoxes)
             end
         end
     end
-    while closestBoomboxName ~= nil then
+    while closestBoomboxName ~= nil do
         boomBoxName = closestBoomboxName
         OpenBoomboxMenu()
         closestBoomboxPos = nil
