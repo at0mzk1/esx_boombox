@@ -252,7 +252,7 @@ Citizen.CreateThread(function()
                     OpenBoomboxMenu()
                 elseif ESX.PlayerData.job.name == "police" then
                     ESX.TriggerServerCallback('esx_boombox:GetBoomBoxes', function(boomBoxes)
-                        if boomBoxes and #boomBoxes > 0 then
+                        if boomBoxes then
                           getClosestBoomBox(boomBoxes)
                         else
                             TriggerEvent("esx:showNotification", _U("not_found"))
