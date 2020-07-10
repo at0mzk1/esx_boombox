@@ -7,6 +7,7 @@ TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
 ESX.RegisterUsableItem('boombox', function(source)
 	local xPlayer = ESX.GetPlayerFromId(source)
 	
+	TriggerClientEvent('esx_boombox:place_boombox', source)
 	xPlayer.removeInventoryItem('boombox', 1)
 	xPlayer.showNotification(_U('put_boombox'))
 end)
