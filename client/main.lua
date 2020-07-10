@@ -251,7 +251,7 @@ Citizen.CreateThread(function()
                 if trim(boomBoxOwner) == trim(GetPlayerName(PlayerId())) then
                     OpenBoomboxMenu()
                 elseif ESX.PlayerData.job.name == "police" then
-                    ESX.TriggerServerCallback('esx_boombox:get_boomboxes', function(boomBoxes)
+                    ESX.TriggerServerCallback('esx_boombox:GetBoomBoxes', function(boomBoxes)
                         if boomBoxes and #boomBoxes > 0 then
                           getClosestBoomBox(boomBoxes)
                         else
