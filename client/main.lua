@@ -48,6 +48,7 @@ AddEventHandler("esx_boombox:place_boombox", function()
         boomBoxName = GetPlayerName(PlayerId()) .. "_boombox"
         boomBoxOwner = GetPlayerName(PlayerId())
     end)
+    TriggerServerEvent("esx_boombox:set_boombox", boomBoxName, objectCoords)
 end)
 
 function OpenBoomboxMenu()
@@ -104,7 +105,6 @@ function OpenAdminMenu(boomBoxes)
         }, function(data, menu)
             if data.current.value == nil then
             else
-                print(data.current.value)
                 boomBoxName = data.current.value
                 menu.close()
                 OpenBoomboxMenu()
@@ -180,6 +180,7 @@ end
 
 function getClosestBoomBox()
     TriggerServerEvent("esx_boombox:get_boomboxes", function(boomBoxes)
+        print(boomBoxes)
         if boomBoxes then
             local closestBoomboxPos = nil
             local closestBoomboxName = nil
@@ -250,7 +251,8 @@ Citizen.CreateThread(function()
                 if trim(boomBoxOwner) == trim(GetPlayerName(PlayerId())) then
                     OpenBoomboxMenu()
                 elseif ESX.PlayerData.job.name == "police" then
-                    OpenAdminMenu()
+                    getClosestBoomBox()
+                    OpenBoomboxMenu()
                 else
                     TriggerEvent("esx:showNotification", _U("dont_own"))
                 end

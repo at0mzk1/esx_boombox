@@ -22,7 +22,7 @@ end)
 
 RegisterServerEvent('esx_boombox:play_music')
 AddEventHandler('esx_boombox:play_music', function(idMusic, url, volume, pos)
-	xSound:PlayUrlPos(-1,idMusic, url, volume, pos)
+	xSound:PlayUrlPos(-1, idMusic, url, volume, pos)
 	xSound:Distance(-1, idMusic, Config.distance)
 	boomBoxes[idMusic] = pos
 end)
@@ -37,14 +37,14 @@ AddEventHandler('esx_boombox:set_volume', function(idMusic, volume)
 	xSound:setVolume(-1, idMusic, volume)
 end)
 
-RegisterServerEvent('esx_boombox:set_volume')
-AddEventHandler('esx_boombox:set_volume', function(idMusic, volume)
-	xSound:setVolume(-1, idMusic, volume)
-end)
-
 RegisterServerEvent('esx_boombox:get_boomboxes')
 AddEventHandler('esx_boombox:get_boomboxes', function()
 	return boomBoxes
+end)
+
+RegisterServerEvent('esx_boombox:set_boombox')
+AddEventHandler('esx_boombox:set_boombox', function(boombox, coords)
+	boomBoxes[boombox] = coords
 end)
 
 RegisterCommand("removeSounds", function(source, args, rawCommand)
@@ -60,7 +60,6 @@ RegisterCommand("removeSounds", function(source, args, rawCommand)
 					xSound:Destroy(-1, id)
 				end
 				xPlayer.showNotification(_U('sounds_destroyed'), false, true, 210)
-				ESX.ShowNotification(_U('put_boombox'), false, true, 210)
 			else
 				xPlayer.showNotification("Insufficient Permissions.", false, true, 130)
 			end
