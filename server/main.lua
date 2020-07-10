@@ -13,10 +13,11 @@ ESX.RegisterUsableItem('boombox', function(source)
 end)
 
 RegisterServerEvent('esx_boombox:remove_boombox')
-AddEventHandler('esx_boombox:remove_boombox', function(coords)
+AddEventHandler('esx_boombox:remove_boombox', function(coords, boomboxName)
 	local xPlayer = ESX.GetPlayerFromId(source)
 	if xPlayer.canCarryItem('boombox', 1) then
 		xPlayer.addInventoryItem('boombox', 1)
+		boomboxes[boomboxName] = nil
 	end
 end)
 

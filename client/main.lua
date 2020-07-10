@@ -125,7 +125,7 @@ function pickupBoomBox(coords)
         DeleteEntity(currentData)
         ESX.Game.DeleteObject(currentData)
         if not DoesEntityExist(currentData) then
-            TriggerServerEvent("esx_boombox:remove_boombox", coords)
+            TriggerServerEvent("esx_boombox:remove_boombox", coords, boomBoxName)
             currentData = nil
         end
         boomBoxName = nil
@@ -183,6 +183,7 @@ function stop(coords)
 end
 
 function getClosestBoomBox(boomBoxes)
+    print("boomBoxes: " .. boomBoxes)
     if boomBoxes then
         local closestBoomboxPos = nil
         local closestBoomboxName = nil
