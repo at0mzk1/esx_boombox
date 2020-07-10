@@ -50,19 +50,21 @@ AddEventHandler('esx_boombox:get_boomboxes', function()
 end)
 
 RegisterCommand("removeSounds", function(source, args, rawCommand)
-	if source == 0 then
-		for id,pos in ipairs(boomBoxes) do
-			xSound:Destroy(-1, id)
-		end
-	else
-		local xPlayer = ESX.GetPlayerFromId(source)
-		if(hasPermissions(xPlayer)) then
-			for id,pos in ipairs(boomBoxes) do
-				xSound:Destroy(-1, id)
-			end
-			xPlayer.showNotification(_U('sounds_destroyed'), false, true, 210)
+	if boomBoxes ~= nil then
+		if source == 0 then
+				for id,pos in ipairs(boomBoxes) do
+					xSound:Destroy(-1, id)
+				end
 		else
-			xPlayer.showNotification("Insufficient Permissions.", false, true, 130)
+			local xPlayer = ESX.GetPlayerFromId(source)
+			if(hasPermissions(xPlayer)) then
+				for id,pos in ipairs(boomBoxes) do
+					xSound:Destroy(-1, id)
+				end
+				xPlayer.showNotification(_U('sounds_destroyed'), false, true, 210)
+			else
+				xPlayer.showNotification("Insufficient Permissions.", false, true, 130)
+			end
 		end
 	end
 end, false)

@@ -90,28 +90,27 @@ end
 
 function OpenAdminMenu(boomBoxes)
     adminMenuOpen = true
-    if #boomBoxes == 0 then
+    if boomBoxes == nil then
         ESX.ShowNotification(_U('no_boomboxes'))
     else
         for id,pos in pairs(boomBoxes) do
             table.insert(elements, {label = id, value = pos})
         end
-    end
-
-    ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'boombox', {
-        title = _U('boombox_admin_menu_title'),
-        align = Config.menuAlignment,
-        elements = elements
-    }, function(data, menu)
-        if data.current.value == nil then
-        else
-            boomBoxName = data.current.value
+        ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'boombox', {
+            title = _U('boombox_admin_menu_title'),
+            align = Config.menuAlignment,
+            elements = elements
+        }, function(data, menu)
+            if data.current.value == nil then
+            else
+                boomBoxName = data.current.value
+                menu.close()
+                OpenBoomboxMenu()
+            end
+        end, function(data, menu)
             menu.close()
-            OpenBoomboxMenu()
-        end
-    end, function(data, menu)
-        menu.close()
-    end)
+        end)
+    end
 end
 
 function pickupBoomBox(coords)
