@@ -44,7 +44,7 @@ end)
 
 RegisterServerEvent('esx_boombox:set_boombox')
 AddEventHandler('esx_boombox:set_boombox', function(boombox, coords)
-	print(boombox, tostrins(coords))
+	print(boombox, tostring(coords))
 	boomBoxes[boombox] = coords
 end)
 
