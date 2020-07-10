@@ -183,7 +183,6 @@ function stop(coords)
 end
 
 function getClosestBoomBox(boomBoxes)
-    print("boomBoxes: " .. boomBoxes)
     local closestBoomboxPos = nil
     local closestBoomboxName = nil
     for k,v in pairs(boomBoxes) do
