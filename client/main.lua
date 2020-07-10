@@ -184,28 +184,24 @@ end
 
 function getClosestBoomBox(boomBoxes)
     print("boomBoxes: " .. boomBoxes)
-    if boomBoxes then
-        local closestBoomboxPos = nil
-        local closestBoomboxName = nil
-        for k,v in pairs(boomBoxes) do
-            local plyPos = GetEntityCoords(GetPlayerPed(-1))
-            local dist = GetVecDist(plyPos, GetEntityCoords(v))
-            if dist < 50.0 then
-            if closestBoomboxName and GetVecDist(plyPos, closestBoomboxPos) < dist then
-                closestBoomboxName = k
-                closestBoomboxPos = v
-            else
-                closestBoomboxName = k
-                closestBoomboxPos = v
-            end
-            end
+    local closestBoomboxPos = nil
+    local closestBoomboxName = nil
+    for k,v in pairs(boomBoxes) do
+        local plyPos = GetEntityCoords(GetPlayerPed(-1))
+        local dist = GetVecDist(plyPos, GetEntityCoords(v))
+        if dist < 50.0 then
+        if closestBoomboxName and GetVecDist(plyPos, closestBoomboxPos) < dist then
+            closestBoomboxName = k
+            closestBoomboxPos = v
+        else
+            closestBoomboxName = k
+            closestBoomboxPos = v
         end
-        boomBoxName = closestBoomboxName
-        print("boomBoxName: " .. boomBoxName)
-        OpenBoomboxMenu()
-    else
-        TriggerEvent("esx:showNotification", _U("not_found"))
+        end
     end
+    boomBoxName = closestBoomboxName
+    OpenBoomboxMenu()
+    print("boomBoxName: " .. boomBoxName)
 end
 
 Citizen.CreateThread(function()
@@ -255,7 +251,13 @@ Citizen.CreateThread(function()
                 if trim(boomBoxOwner) == trim(GetPlayerName(PlayerId())) then
                     OpenBoomboxMenu()
                 elseif ESX.PlayerData.job.name == "police" then
-                    TriggerServerEvent("get_boomboxes")
+                    ESX.TriggerServerCallback('esx_boombox:get_boomboxes', function(boomBoxes)
+                        if boomBoxes and #boomBoxes > 0 then
+                          getClosestBoomBox(boomBoxes)
+                        else
+                            TriggerEvent("esx:showNotification", _U("not_found"))
+                        end
+                      end)
                 else
                     TriggerEvent("esx:showNotification", _U("dont_own"))
                 end
@@ -266,6 +268,3 @@ end)
 
 RegisterNetEvent('esx_boombox:boomboxes_menu')
 AddEventHandler('esx_boombox:boomboxes_menu', function(data) OpenAdminMenu(data); end)
-
-RegisterNetEvent('esx_boombox:police_menu')
-AddEventHandler('esx_boombox:police_menu', function(data) getClosestBoomBox(data); end)

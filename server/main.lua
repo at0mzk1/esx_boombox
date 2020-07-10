@@ -17,7 +17,7 @@ AddEventHandler('esx_boombox:remove_boombox', function(coords, boomboxName)
 	local xPlayer = ESX.GetPlayerFromId(source)
 	if xPlayer.canCarryItem('boombox', 1) then
 		xPlayer.addInventoryItem('boombox', 1)
-		boomboxes[boomboxName] = nil
+		boomBoxes[boomboxName] = nil
 	end
 end)
 
@@ -38,14 +38,12 @@ AddEventHandler('esx_boombox:set_volume', function(idMusic, volume)
 	xSound:setVolume(-1, idMusic, volume)
 end)
 
-RegisterServerEvent('esx_boombox:get_boomboxes')
-AddEventHandler('esx_boombox:get_boomboxes', function()
-	TriggerClientEvent('esx_boombox:police_menu', -1, boomBoxes)
-end)
+function GetBoomBoxes()
+	return boomBoxes
+end
 
 RegisterServerEvent('esx_boombox:set_boombox')
 AddEventHandler('esx_boombox:set_boombox', function(boombox, coords)
-	print(boombox, tostring(coords))
 	boomBoxes[boombox] = coords
 end)
 
