@@ -39,7 +39,7 @@ end)
 
 RegisterServerEvent('esx_boombox:get_boomboxes')
 AddEventHandler('esx_boombox:get_boomboxes', function()
-	return boomBoxes
+	TriggerClientEvent('esx_boombox:police_menu', -1, boomBoxes)
 end)
 
 RegisterServerEvent('esx_boombox:set_boombox')

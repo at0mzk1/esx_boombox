@@ -116,21 +116,25 @@ function OpenAdminMenu(boomBoxes)
 end
 
 function pickupBoomBox(coords)
-    NetworkRequestControlOfEntity(currentData)
-    startAnimation("anim@heists@narcotics@trash","pickup")
-    Citizen.Wait(700)
-    SetEntityAsMissionEntity(currentData,false,true)
-    stop(coords)
-    DeleteEntity(currentData)
-    ESX.Game.DeleteObject(currentData)
-    if not DoesEntityExist(currentData) then
-        TriggerServerEvent("esx_boombox:remove_boombox", coords)
-        currentData = nil
+    if DoesEntityExist(currentData) then
+        NetworkRequestControlOfEntity(currentData)
+        startAnimation("anim@heists@narcotics@trash","pickup")
+        Citizen.Wait(700)
+        SetEntityAsMissionEntity(currentData,false,true)
+        stop(coords)
+        DeleteEntity(currentData)
+        ESX.Game.DeleteObject(currentData)
+        if not DoesEntityExist(currentData) then
+            TriggerServerEvent("esx_boombox:remove_boombox", coords)
+            currentData = nil
+        end
+        boomBoxName = nil
+        boomBoxOwner = "nil"
+        Citizen.Wait(500)
+        ClearPedTasks(PlayerPedId())
+    else
+        TriggerEvent("esx:showNotification", _U("no_boombox"))
     end
-    boomBoxName = nil
-    boomBoxOwner = "nil"
-    Citizen.Wait(500)
-    ClearPedTasks(PlayerPedId())
 end
 
 function setVolume(coords)
@@ -178,30 +182,29 @@ function stop(coords)
             end
 end
 
-function getClosestBoomBox()
-    TriggerServerEvent("esx_boombox:get_boomboxes", function(boomBoxes)
-        print("boomboxes: " .. boomBoxes)
-        if boomBoxes then
-            local closestBoomboxPos = nil
-            local closestBoomboxName = nil
-            for k,v in pairs(boomBoxes) do
-              local plyPos = GetEntityCoords(GetPlayerPed(-1))
-              local dist = GetVecDist(plyPos, GetEntityCoords(v))
-              if dist < 50.0 then
-                if closestBoomboxName and GetVecDist(plyPos, closestBoomboxPos) < dist then
-                    closestBoomboxName = k
-                    closestBoomboxPos = v
-                else
-                    closestBoomboxName = k
-                    closestBoomboxPos = v
-                end
-              end
+function getClosestBoomBox(boomBoxes)
+    if boomBoxes then
+        local closestBoomboxPos = nil
+        local closestBoomboxName = nil
+        for k,v in pairs(boomBoxes) do
+            local plyPos = GetEntityCoords(GetPlayerPed(-1))
+            local dist = GetVecDist(plyPos, GetEntityCoords(v))
+            if dist < 50.0 then
+            if closestBoomboxName and GetVecDist(plyPos, closestBoomboxPos) < dist then
+                closestBoomboxName = k
+                closestBoomboxPos = v
+            else
+                closestBoomboxName = k
+                closestBoomboxPos = v
             end
-            boomBoxName = closestBoomboxName
-        else
-        TriggerEvent("esx:showNotification", _U("not_found"))
+            end
         end
-    end)
+        boomBoxName = closestBoomboxName
+        print("boomBoxName: " .. boomBoxName)
+        OpenBoomboxMenu()
+    else
+        TriggerEvent("esx:showNotification", _U("not_found"))
+    end
 end
 
 Citizen.CreateThread(function()
@@ -251,9 +254,7 @@ Citizen.CreateThread(function()
                 if trim(boomBoxOwner) == trim(GetPlayerName(PlayerId())) then
                     OpenBoomboxMenu()
                 elseif ESX.PlayerData.job.name == "police" then
-                    getClosestBoomBox()
-                    print(boomBoxName)
-                    OpenBoomboxMenu()
+                    TriggerServerEvent("get_boomboxes")
                 else
                     TriggerEvent("esx:showNotification", _U("dont_own"))
                 end
@@ -264,3 +265,6 @@ end)
 
 RegisterNetEvent('esx_boombox:boomboxes_menu')
 AddEventHandler('esx_boombox:boomboxes_menu', function(data) OpenAdminMenu(data); end)
+
+RegisterNetEvent('esx_boombox:police_menu')
+AddEventHandler('esx_boombox:police_menu', function(data) getClosestBoomBox(data); end)
