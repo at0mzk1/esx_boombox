@@ -190,11 +190,9 @@ function getClosestBoomBox(boomBoxes)
         local dist = GetVecDist(plyPos, v)
         if dist < 50.0 then
             if closestBoomboxName and GetVecDist(plyPos, closestBoomboxPos) < dist then
-                print(closestBoomboxName)
                 closestBoomboxName = k
                 closestBoomboxPos = v
             else
-                print(k)
                 closestBoomboxName = k
                 closestBoomboxPos = v
             end
