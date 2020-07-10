@@ -44,6 +44,7 @@ end)
 
 RegisterServerEvent('esx_boombox:set_boombox')
 AddEventHandler('esx_boombox:set_boombox', function(boombox, coords)
+	print(boombox, tostrins(coords))
 	boomBoxes[boombox] = coords
 end)
 
@@ -71,7 +72,7 @@ RegisterCommand("boombox", function(source, args, rawCommand)
 	if source ~= 0 then
 		local xPlayer = ESX.GetPlayerFromId(source)
 		if(hasPermissions(xPlayer)) then
-			TriggerClientEvent('esx_boombox:boomboxes_menu', -1, boomBoxes)
+			TriggerClientEvent('esx_boombox:boomboxes_menu', source, boomBoxes)
 		else
 			xPlayer.showNotification("Insufficient Permissions.", false, true, 130)
 		end
