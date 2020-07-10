@@ -77,3 +77,5 @@ RegisterCommand("boombox", function(source, args, rawCommand)
 		end
 	end
 end, false)
+
+ESX.RegisterServerCallback('esx_boombox:GetBoomBoxes', function(source,cb) cb(GetBoomBoxes() or nil); end)
