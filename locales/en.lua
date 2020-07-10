@@ -18,5 +18,5 @@ Locales ["en"] = {
 	["sounds_destroyed_help"] = "Turns off all boomboxes in the server.",
 	["no_boomboxes"] = "There are no boomboxes in the server.",
 	["no_sounds"] = "There are no boomboxes playing music in the server.",
-	["no_boombox"] = "There are no boomboxes around.",
+	["no_boombox"] = "There are no boomboxes around."
 }

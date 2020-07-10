@@ -189,18 +189,23 @@ function getClosestBoomBox(boomBoxes)
         local plyPos = GetEntityCoords(GetPlayerPed(-1))
         local dist = GetVecDist(plyPos, GetEntityCoords(v))
         if dist < 50.0 then
-        if closestBoomboxName and GetVecDist(plyPos, closestBoomboxPos) < dist then
-            closestBoomboxName = k
-            closestBoomboxPos = v
-        else
-            closestBoomboxName = k
-            closestBoomboxPos = v
-        end
+            if closestBoomboxName and GetVecDist(plyPos, closestBoomboxPos) < dist then
+                print(closestBoomboxName)
+                closestBoomboxName = k
+                closestBoomboxPos = v
+            else
+                print(k)
+                closestBoomboxName = k
+                closestBoomboxPos = v
+            end
         end
     end
-    boomBoxName = closestBoomboxName
-    OpenBoomboxMenu()
-    print("boomBoxName: " .. boomBoxName)
+    while closestBoomboxName ~= nil then
+        boomBoxName = closestBoomboxName
+        OpenBoomboxMenu()
+        closestBoomboxPos = nil
+        closestBoomboxName = nil
+    end
 end
 
 Citizen.CreateThread(function()
